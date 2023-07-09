@@ -54,6 +54,14 @@
         This field should be greater than 6 characters
       </p>
     </div>
+    <div>
+      <p
+        *ngIf="this.status === 'failed'"
+        class="font-medium text-red-500 text-xs mt-1 ml-1"
+      >
+        Credentials are invalid
+      </p>
+    </div>
   </div>
   <div>
     <app-btn
