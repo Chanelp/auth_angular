@@ -31,4 +31,12 @@ export class AuthService {
       switchMap(() => this.login(email, password))
     )
   }
+
+  recovery(email: string){
+    return this.http.post(`${this.apiURl}api/v1/auth/recovery`, { email});
+  }
+
+  changePassword(token: string, newPassword: string){
+    return this.http.post(`${this.apiURl}api/v1/auth/change-password`, {token, newPassword})
+  }
 }
