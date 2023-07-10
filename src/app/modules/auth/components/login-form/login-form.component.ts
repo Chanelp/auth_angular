@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { faPen, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { RequestStatus } from '@models/request-status';
 import { AuthService } from '@services/auth.service';
@@ -24,14 +24,23 @@ export class LoginFormComponent {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+    private route: ActivatedRoute
+  ) {
+    this.route.queryParamMap.subscribe(params => {
+      const email = params.get('email');
+
+      if(email){
+        this.form.controls.email.setValue(email);
+      }
+    })
+  }
 
   doLogin() {
     if (this.form.valid) {
       this.status = 'loading';
       const { email, password } = this.form.getRawValue();
-      
+
       this.authService.login(email, password)
       .subscribe({
         next: () => {

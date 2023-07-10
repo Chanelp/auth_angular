@@ -12,6 +12,7 @@ import { RequestStatus } from '@models/request-status';
   templateUrl: './register-form.component.html',
 })
 export class RegisterFormComponent {
+
   form = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.email, Validators.required]],
@@ -20,10 +21,18 @@ export class RegisterFormComponent {
   }, {
     validators: [ CustomValidators.MatchValidator('password', 'confirmPassword') ]
   });
+
+  formUser = this.formBuilder.nonNullable.group({
+    email: ['', [Validators.required]]
+  });
+
   status: RequestStatus = 'init';
+  statusUser: RequestStatus = 'init';
+
   faEye = faEye;
   faEyeSlash = faEyeSlash;
   showPassword = false;
+  showRegister = false;
 
   message: string = '';
 
@@ -55,6 +64,34 @@ export class RegisterFormComponent {
 
     } else {
       this.form.markAllAsTouched();
+    }
+  }
+
+  validateUser(){
+    if(this.formUser.valid){
+      this.statusUser = 'success';
+      const { email } = this.formUser.getRawValue();
+
+      this.authService.isAvailable(this.formUser.controls.email.getRawValue())
+      .subscribe({
+        next: (rta) => {
+          this.statusUser = 'success';
+          if(rta.isAvailable){
+            this.showRegister = true;
+            this.form.controls.email.setValue(email);
+          }
+          else{
+            this.router.navigate(['/login'], { queryParams: { email }});
+          }
+        },
+        error: () => {
+          this.statusUser = 'failed';
+        }
+      })
+
+    }
+    else {
+      this.statusUser = 'failed';
     }
   }
 }
