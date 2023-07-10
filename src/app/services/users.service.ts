@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TokenService } from './token.service';
 import { environment } from '@environments/environment';
@@ -16,8 +16,8 @@ export class UsersService {
   getUsers(){
     const token = this.tokenService.getToken();
 
-    return this.http.get<User[]>(`${this.apiUrl}api/v1/users`, {
-      headers: {authorization: `Bearer ${token}`}
-    });
+    let headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get<User[]>(`${this.apiUrl}api/v1/users`, {headers: headers});
   }
 }

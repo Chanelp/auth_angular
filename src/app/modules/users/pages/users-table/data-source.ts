@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class DataSourceUser extends DataSource<User> {
 
   data = new BehaviorSubject<User[]>([]);
-  originalData: any[]= [];
+  originalData: User[]= [];
 
   connect(): Observable<User[]> {
     return this.data;
