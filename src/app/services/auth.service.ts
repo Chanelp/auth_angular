@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { environment } from '@environments/environment';
-import { switchMap, tap } from 'rxjs';
+import { BehaviorSubject, switchMap, tap } from 'rxjs';
 import { TokenService } from './token.service';
 import { ResponseLogin } from '@models/auth.model';
+import { User } from '@models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ import { ResponseLogin } from '@models/auth.model';
 export class AuthService {
 
   apiURl = environment.API_URL;
+  user$ = new BehaviorSubject<User | null>(null);
 
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
@@ -48,5 +50,18 @@ export class AuthService {
 
   logout(){
     this.tokenService.removeToken();
+  }
+
+  getProfile(){
+    const token = this.tokenService.getToken();
+
+    let headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get<User>(`${this.apiURl}api/v1/auth/profile`, {headers: headers})
+    .pipe(
+      tap(user => {
+        this.user$.next(user);
+      })
+    );
   }
 }
