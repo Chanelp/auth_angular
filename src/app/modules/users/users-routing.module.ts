@@ -6,7 +6,8 @@ import { UsersTableComponent } from './pages/users-table/users-table.component';
 const routes: Routes = [
   {
     path: '',
-    component: UsersTableComponent
+    component: UsersTableComponent,
+    title: 'Usuarios'
   }
 ];
 
