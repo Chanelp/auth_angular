@@ -12,18 +12,22 @@ import { RequestStatus } from '@models/request-status';
   templateUrl: './register-form.component.html',
 })
 export class RegisterFormComponent {
-
-  form = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required]],
-    email: ['', [Validators.email, Validators.required]],
-    password: ['', [Validators.minLength(8), Validators.required]],
-    confirmPassword: ['', [Validators.required]],
-  }, {
-    validators: [ CustomValidators.MatchValidator('password', 'confirmPassword') ]
-  });
+  form = this.formBuilder.nonNullable.group(
+    {
+      name: ['', [Validators.required]],
+      email: ['', [Validators.email, Validators.required]],
+      password: ['', [Validators.minLength(8), Validators.required]],
+      confirmPassword: ['', [Validators.required]],
+    },
+    {
+      validators: [
+        CustomValidators.MatchValidator('password', 'confirmPassword'),
+      ],
+    }
+  );
 
   formUser = this.formBuilder.nonNullable.group({
-    email: ['', [Validators.required]]
+    email: ['', [Validators.required]],
   });
 
   status: RequestStatus = 'init';
@@ -46,51 +50,47 @@ export class RegisterFormComponent {
     if (this.form.valid) {
       this.status = 'loading';
       const { name, email, password } = this.form.getRawValue();
-      this.authService.registerAndLogin(name, email, password)
-      .subscribe({
+      this.authService.registerAndLogin(name, email, password).subscribe({
         next: () => {
           this.status = 'success';
-        this.router.navigate(['/app/boards']);
+          this.router.navigate(['/app/boards']);
         },
         error: (error) => {
-          if(error.error.code === 'SQLITE_CONSTRAINT_UNIQUE'){
+          if (error.error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
             this.message = 'This user already exists. Do you want to Login?';
           }
 
           this.status = 'failed';
           console.log(error);
-        }
-      })
-
+        },
+      });
     } else {
       this.form.markAllAsTouched();
     }
   }
 
-  validateUser(){
-    if(this.formUser.valid){
+  validateUser() {
+    if (this.formUser.valid) {
       this.statusUser = 'success';
       const { email } = this.formUser.getRawValue();
 
-      this.authService.isAvailable(this.formUser.controls.email.getRawValue())
-      .subscribe({
-        next: (rta) => {
-          this.statusUser = 'success';
-          if(rta.isAvailable){
-            this.showRegister = true;
-            this.form.controls.email.setValue(email);
-          }
-          else{
-            this.router.navigate(['/login'], { queryParams: { email }});
-          }
-        },
-        error: () => {
-          this.statusUser = 'failed';
-        }
-      })
-
-    }
-    else {
+      this.authService
+        .isAvailable(this.formUser.controls.email.getRawValue())
+        .subscribe({
+          next: (rta) => {
+            this.statusUser = 'success';
+            if (rta.isAvailable) {
+              this.showRegister = true;
+              this.form.controls.email.setValue(email);
+            } else {
+              this.router.navigate(['/login'], { queryParams: { email } });
+            }
+          },
+          error: () => {
+            this.statusUser = 'failed';
+          },
+        });
+    } else {
       this.statusUser = 'failed';
     }
   }
